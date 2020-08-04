@@ -27,28 +27,34 @@ public class SimpleMetrics {
 
         System.out.println("Document Frequency："+ topDocs.totalHits);
         int Term_Frequency = 0;
+        int i =0;
         for (ScoreDoc scoreDoc : topDocs.scoreDocs) {
 
             Document document = indexSearcher.doc(scoreDoc.doc);
             Parser parse = new Parser(new StringReader(document.get("context")));
-            Term_Frequency=countStr(parse.toString(),str);
-            System.out.println("Term_Frequency: "+Term_Frequency);
+            String x = parse.body.toLowerCase()+parse.title.toLowerCase();
+            Term_Frequency=countStr(x,str)+Term_Frequency;
         }
+        System.out.println("Term_Frequency: "+Term_Frequency);
 
         indexReader.close();
     }
 
     public static int countStr(String str1, String str2){
-        int counter =0;
-        if (str1.indexOf(str2) == -1) {
-            return 0;
-        } else if (str1.indexOf(str2) != -1) {
-            counter++;
-            countStr(str1.substring(str1.indexOf(str2) +
-                    str2.length()), str2);
-            return counter;
+        int minLength=str1.length();
+        int subLength=str2.length();
+        int count=0;
+        int index=0;
+
+        if(minLength>=subLength){
+
+            while ((index=str1.indexOf(str2,index))!=-1){
+                count++;
+                index+=subLength;
+            }
+            return count;
         }
-        return 0;
+        return -1;
     }
 
     public static void main(String[] args) throws Exception{
